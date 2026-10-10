@@ -1,15 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../data/quotes.dart';
 import '../data/streak_service.dart';
+import '../data/relapse_service.dart';
 import '../models/aura_tier.dart';
 import '../widgets/aura_avatar.dart';
 import '../widgets/week_tracker.dart';
 import 'sensei_chat_screen.dart';
-import '../data/relapse_service.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,6 +62,58 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       debugPrint("Relapse API failed: $e");
     }
+  }
+
+  void _openReflectionSheet(BuildContext context) {
+    final controller = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20, right: 20, top: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Today's Reflection",
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 5,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "What's on your mind today?",
+                  hintStyle: const TextStyle(color: AppColors.textSecondary),
+                  filled: true,
+                  fillColor: AppColors.surfaceLight,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // TODO: controller.text को reflection.php API के through save करना है
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text("Save Reflection"),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -125,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppColors.surfaceLight,
                   icon: Icons.nightlight_round,
                   label: "Reflect",
-                  onTap: () {}, // TODO: open reflection entry sheet
+                  onTap: () => _openReflectionSheet(context),
                 ),
                 _ActionCircle(
                   color: AppColors.surfaceLight,
@@ -165,17 +215,60 @@ class _QuoteCenterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
       decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient.scale(0.15),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.primaryEnd.withOpacity(0.4)),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.surface,
+            AppColors.surfaceLight.withOpacity(0.6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFC084FC).withOpacity(0.6), // सॉफ्ट पर्पल नियोन टच
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFC084FC).withOpacity(0.2),
+            blurRadius: 20,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: const Color(0xFF60A5FA).withOpacity(0.1),
+            blurRadius: 35,
+            spreadRadius: 4,
+          ),
+        ],
       ),
-      child: Text(quote, textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500, height: 1.4)),
+      child: Column(
+        children: [
+          // छोटा सा डेकोरेटिव आइकॉन ऊपर
+          const Icon(
+            Icons.format_quote_rounded,
+            color: Color(0xFFC084FC),
+            size: 28,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            quote,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15.5,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
 
 class _ActionCircle extends StatelessWidget {
   final IconData icon;
@@ -220,15 +313,14 @@ class _PanicButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFFF8A80), width: 1.5),
           boxShadow: [
-            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.7), blurRadius: 30, spreadRadius: 2),
-            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.4), blurRadius: 50, spreadRadius: 6),
+            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.7), blurRadius: 25, spreadRadius: 1),
+            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.3), blurRadius: 40, spreadRadius: 4),
           ],
         ),
         alignment: Alignment.center,
         child: const Text("PANIC BUTTON",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17, letterSpacing: 1.5)),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.5)),
       ),
     );
   }
 }
-
