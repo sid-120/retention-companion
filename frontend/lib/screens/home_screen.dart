@@ -8,6 +8,8 @@ import '../models/aura_tier.dart';
 import '../widgets/aura_avatar.dart';
 import '../widgets/week_tracker.dart';
 import 'sensei_chat_screen.dart';
+import '../data/relapse_service.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,11 +47,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _relapse() async {
-    final newStart = await StreakService.resetStreak();
-    setState(() {
-      streakStart = newStart;
-      _elapsed = Duration.zero;
-    });
+    const int currentUserId = 1; // TODO: असली logged-in user_id यहाँ डालना
+
+    try {
+      final result = await RelapseService.recordRelapse(currentUserId);
+
+      if (result.success) {
+        final adjustedStart = DateTime.now().subtract(Duration(days: result.newStreakDays));
+        await StreakService.setStartDate(adjustedStart);
+
+        setState(() {
+          streakStart = adjustedStart;
+          _elapsed = DateTime.now().difference(adjustedStart);
+        });
+      }
+    } catch (e) {
+      debugPrint("Relapse API failed: $e");
+    }
   }
 
   @override
@@ -200,14 +214,21 @@ class _PanicButton extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.redAccent.withOpacity(0.4)),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF1744), Color(0xFFFF5252)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFFF8A80), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.7), blurRadius: 30, spreadRadius: 2),
+            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.4), blurRadius: 50, spreadRadius: 6),
+          ],
         ),
-        child: const Center(
-          child: Text("PANIC BUTTON", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-        ),
+        alignment: Alignment.center,
+        child: const Text("PANIC BUTTON",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17, letterSpacing: 1.5)),
       ),
     );
   }
 }
+
