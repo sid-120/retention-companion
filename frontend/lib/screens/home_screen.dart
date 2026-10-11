@@ -4,10 +4,12 @@ import '../theme/app_theme.dart';
 import '../data/quotes.dart';
 import '../data/streak_service.dart';
 import '../data/relapse_service.dart';
+import '../data/reflection_service.dart';
 import '../models/aura_tier.dart';
 import '../widgets/aura_avatar.dart';
 import '../widgets/week_tracker.dart';
 import 'sensei_chat_screen.dart';
+import 'panic_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _relapse() async {
-    const int currentUserId = 1; // TODO: असली logged-in user_id यहाँ डालना
+    const int currentUserId = 1; 
 
     try {
       final result = await RelapseService.recordRelapse(currentUserId);
@@ -71,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         return Padding(
@@ -91,22 +93,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 maxLines: 5,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: "What's on your mind today?",
+                  hintText: "What's on your mind today, Siddharth?",
                   hintStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
                   fillColor: AppColors.surfaceLight,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                 ),
               ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: controller.text को reflection.php API के through save करना है
-                    Navigator.pop(ctx);
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF60A5FA),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: () async {
+                    if (controller.text.trim().isNotEmpty) {
+                      await ReflectionService.addReflection(controller.text.trim());
+                      Navigator.pop(ctx);
+                      setState(() {}); 
+                    }
                   },
-                  child: const Text("Save Reflection"),
+                  child: const Text("Save Reflection", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
             ],
@@ -142,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             WeekTracker(activeDays: activeDays),
             const SizedBox(height: 12),
+            // यहाँ अब streakDays पास किया गया है ताकि अवतार डायनेमिक रहे
             AuraAvatar(streakDays: streakDays),
             const SizedBox(height: 8),
             Text("${tierData.label} · DAY $streakDays",
@@ -161,34 +172,60 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 22),
             _QuoteCenterCard(quote: QuoteEngine.todayQuote()),
-            const SizedBox(height: 22),
+            const SizedBox(height: 26),
+            
+            // Modern Action Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _ActionCircle(
-                  gradient: const LinearGradient(colors: [Color(0xFFC084FC), Color(0xFF60A5FA), Color(0xFFFBBF24)]),
+                _ModernActionCard(
                   icon: Icons.auto_awesome_rounded,
                   label: "Sensei",
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFC084FC), Color(0xFF818CF8)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shadowColor: const Color(0xFFC084FC).withOpacity(0.4),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SenseiChatScreen())),
                 ),
-                _ActionCircle(
-                  color: AppColors.surfaceLight,
+                _ModernActionCard(
                   icon: Icons.nightlight_round,
                   label: "Reflect",
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF38BDF8), Color(0xFF0284C7)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shadowColor: const Color(0xFF38BDF8).withOpacity(0.4),
                   onTap: () => _openReflectionSheet(context),
                 ),
-                _ActionCircle(
-                  color: AppColors.surfaceLight,
-                  icon: Icons.emoji_emotions_outlined,
-                  label: "I relapsed",
+                _ModernActionCard(
+                  icon: Icons.refresh_rounded,
+                  label: "Relapsed",
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shadowColor: const Color(0xFFFB7185).withOpacity(0.4),
                   onTap: _relapse,
                 ),
               ],
             ),
+            
             const SizedBox(height: 26),
-            _PanicButton(onTap: () {}), // TODO: emergency support screen
-            const SizedBox(height: 8),
-            Text("In case of emergency, press here", style: Theme.of(context).textTheme.bodyMedium),
+            
+            // Modern Emergency / Panic Button
+            _ModernPanicButton(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PanicScreen()),
+                );
+              },
+            ),
+            
             const SizedBox(height: 12),
           ],
         ),
@@ -227,7 +264,7 @@ class _QuoteCenterCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFC084FC).withOpacity(0.6), // सॉफ्ट पर्पल नियोन टच
+          color: const Color(0xFFC084FC).withOpacity(0.6),
           width: 1.5,
         ),
         boxShadow: [
@@ -236,16 +273,10 @@ class _QuoteCenterCard extends StatelessWidget {
             blurRadius: 20,
             spreadRadius: 2,
           ),
-          BoxShadow(
-            color: const Color(0xFF60A5FA).withOpacity(0.1),
-            blurRadius: 35,
-            spreadRadius: 4,
-          ),
         ],
       ),
       child: Column(
         children: [
-          // छोटा सा डेकोरेटिव आइकॉन ऊपर
           const Icon(
             Icons.format_quote_rounded,
             color: Color(0xFFC084FC),
@@ -269,35 +300,63 @@ class _QuoteCenterCard extends StatelessWidget {
   }
 }
 
-
-class _ActionCircle extends StatelessWidget {
+class _ModernActionCard extends StatelessWidget {
   final IconData icon;
   final String label;
+  final Gradient gradient;
+  final Color shadowColor;
   final VoidCallback onTap;
-  final Color? color;
-  final Gradient? gradient;
-  const _ActionCircle({required this.icon, required this.label, required this.onTap, this.color, this.gradient});
+
+  const _ModernActionCard({
+    required this.icon,
+    required this.label,
+    required this.gradient,
+    required this.shadowColor,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(children: [
-        Container(
-          width: 58, height: 58,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: color, gradient: gradient),
-          child: Icon(icon, color: Colors.white, size: 26),
-        ),
-        const SizedBox(height: 6),
-        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-      ]),
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: gradient,
+              boxShadow: [
+                BoxShadow(
+                  color: shadowColor,
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.white, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _PanicButton extends StatelessWidget {
+// नया Modern Neon Panic / Emergency Button
+class _ModernPanicButton extends StatelessWidget {
   final VoidCallback onTap;
-  const _PanicButton({required this.onTap});
+
+  const _ModernPanicButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -305,21 +364,62 @@ class _PanicButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFFFF1744), Color(0xFFFF5252)],
+            colors: [Color(0xFFE11D48), Color(0xFF9F1239)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFFF8A80), width: 1.5),
           boxShadow: [
-            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.7), blurRadius: 25, spreadRadius: 1),
-            BoxShadow(color: const Color(0xFFFF1744).withOpacity(0.3), blurRadius: 40, spreadRadius: 4),
+            BoxShadow(
+              color: Colors.redAccent.withOpacity(0.5),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
-        alignment: Alignment.center,
-        child: const Text("PANIC BUTTON",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.5)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.2),
+              ),
+              child: const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "EMERGENCY / PANIC",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  "In case of emergency, press here",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
