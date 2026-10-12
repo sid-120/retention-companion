@@ -14,7 +14,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<ReflectionModel> _reflections = [];
   bool _loading = true;
-  int _streakDays = 3;
+  
+  // होमपेज की तरह ही स्ट्रीक वैल्यू
+  int _streakDays = 3; 
 
   @override
   void initState() {
@@ -104,30 +106,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
             
-            // अवतार सेक्शन: सराउंडिंग रिंग, ब्राइट बैकग्राउंड और सही Shadow अवतार (Streak के हिसाब से)
+            // ----------------------------------------------------
+            // यहाँ पर हमने वही असली AuraAvatar विजेट रख दिया है 
+            // जो होमपेज पर इस्तेमाल होता है (ताकि बिल्कुल सही Shadow अवतार आए)
+            // ----------------------------------------------------
             Center(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      primaryColor.withOpacity(0.35),
-                      const Color(0xFF1E293B).withOpacity(0.5),
-                      Colors.transparent,
-                    ],
-                  ),
-                  border: Border.all(color: primaryColor.withOpacity(0.6), width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withOpacity(0.2),
-                      blurRadius: 20,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: AuraAvatar(streakDays: _streakDays),
-              ),
+              child: AuraAvatar(streakDays: _streakDays),
             ),
             const SizedBox(height: 14),
             
@@ -178,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 28),
 
-            // मॉडर्न स्टेट्स बार (प्रीमियम ग्रेडिएंट के साथ - जैसा आपको पसंद है)
+            // मॉडर्न स्टेट्स बार (आपका पसंदीदा प्रीमियम डिज़ाइन)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
               decoration: BoxDecoration(
