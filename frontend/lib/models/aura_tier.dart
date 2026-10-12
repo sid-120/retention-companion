@@ -21,19 +21,24 @@ class AuraTierData {
     required this.particleCount,
   });
 
-  /// Day-based progression: Day 0-2 = no aura, builds up to Day 90+ = full cosmic aura
+  /// Day-based progression as per your exact requirements:
+  /// - 0 to 7 days: Shadow
+  /// - 8 to 14 days: Spark
+  /// - 15 to 30 days: Ember
+  /// - 31 to 60 days: Radiant
+  /// - 61 to 90+ days: Cosmic
   static AuraTierData forDays(int days) {
-    if (days >= 90) {
+    if (days >= 61) {
       return const AuraTierData(
         tier: AuraTier.cosmic,
-        label: "SENSEI",
+        label: "COSMIC",
         assetPath: "assets/avatars/cosmic.png",
         colors: [Color(0xFFC084FC), Color(0xFF60A5FA), Color(0xFFFBBF24), Color(0xFFF472B6)],
         glowRadius: 90,
         glowOpacity: 0.65,
         particleCount: 40,
       );
-    } else if (days >= 30) {
+    } else if (days >= 31) {
       return const AuraTierData(
         tier: AuraTier.radiant,
         label: "RADIANT",
@@ -43,7 +48,7 @@ class AuraTierData {
         glowOpacity: 0.55,
         particleCount: 26,
       );
-    } else if (days >= 7) {
+    } else if (days >= 15) {
       return const AuraTierData(
         tier: AuraTier.ember,
         label: "EMBER",
@@ -53,7 +58,7 @@ class AuraTierData {
         glowOpacity: 0.45,
         particleCount: 16,
       );
-    } else if (days >= 3) {
+    } else if (days >= 8) {
       return const AuraTierData(
         tier: AuraTier.spark,
         label: "SPARK",

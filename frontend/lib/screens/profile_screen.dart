@@ -15,8 +15,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<ReflectionModel> _reflections = [];
   bool _loading = true;
   
-  // होमपेज की तरह ही स्ट्रीक वैल्यू
-  int _streakDays = 3; 
+  // स्ट्रीक के दिन (आप चाहें तो इसे बदल सकते हैं)
+  int _streakDays = 3;
 
   @override
   void initState() {
@@ -106,14 +106,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
             
-            // ----------------------------------------------------
-            // यहाँ पर हमने वही असली AuraAvatar विजेट रख दिया है 
-            // जो होमपेज पर इस्तेमाल होता है (ताकि बिल्कुल सही Shadow अवतार आए)
-            // ----------------------------------------------------
+            // अवतार सेक्शन (AuraAvatar विजेट जो होमपेज की तरह बिल्कुल सही काम करेगा)
             Center(
-              child: AuraAvatar(streakDays: _streakDays),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      primaryColor.withOpacity(0.25),
+                      Colors.transparent,
+                    ],
+                  ),
+                  border: Border.all(color: primaryColor.withOpacity(0.4), width: 1.5),
+                ),
+                child: AuraAvatar(streakDays: _streakDays),
+              ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             
             Center(
               child: Text(
@@ -128,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 8),
             
-            // टियर लेबल बैज
+            // टियर लेबल बैज (या स्ट्रीक के हिसाब से सही टियर)
             Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -162,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 28),
 
-            // मॉडर्न स्टेट्स बार (आपका पसंदीदा प्रीमियम डिज़ाइन)
+            // मॉडर्न स्टेट्स बार (प्रीमियम डिज़ाइन)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
               decoration: BoxDecoration(
@@ -197,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 20),
 
-            // रिफ्लेक्शन और प्रोग्रेस कार्ड्स (वही शानदार प्रीमियम लुक)
+            // रिफ्लेक्शन और प्रोग्रेस कार्ड्स
             Row(
               children: [
                 Expanded(
