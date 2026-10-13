@@ -10,6 +10,8 @@ import '../widgets/aura_avatar.dart';
 import '../widgets/week_tracker.dart';
 import 'sensei_chat_screen.dart';
 import 'panic_screen.dart';
+import '../widgets/reflect_bottom_sheet.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,6 +41,19 @@ class _HomeScreenState extends State<HomeScreen> {
       _loading = false;
     });
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+  }
+
+    void _openReflectModal() async {
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const ReflectBottomSheet(),
+    );
+
+    if (result == true) {
+      setState(() {});
+    }
   }
 
   void _tick() {
